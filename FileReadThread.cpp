@@ -26,7 +26,6 @@ void FileReadThreadType::ThreadMain()
 
     if (queue_size > SlowdownQueueSize)
     {
-      cout << "Slowing file read thread\n";
       std::this_thread::sleep_for(std::chrono::nanoseconds(1));
     }
 

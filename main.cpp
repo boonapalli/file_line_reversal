@@ -4,6 +4,7 @@
 #include <fstream>
 #include <queue>
 #include <cassert>
+#include <ctime>
 
 #include "FileReadThread.hpp"
 #include "FileWriteThread.hpp"
@@ -41,6 +42,8 @@ int main(int argc, char* argv[])
     cout << "Failed to open output text file: " << out_file_name << "\n";
     return -1;
   }
+
+  const clock_t c_start = clock();
 
   FileWriteThreadType fileWriteObj(out_fs);
   FileReadThreadType fileReadObj(in_fs);
@@ -81,6 +84,10 @@ int main(int argc, char* argv[])
   {
     lineReverseThreads[i].join();
   }
+
+  const clock_t c_end = clock();
+
+  cout << "Took " << ((float)c_end - c_start)/CLOCKS_PER_SEC << " seconds\n";
 
   return 0;
 }
