@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+project( test )
+add_executable( test )
+target_sources( test PUBLIC ./main.cpp ./FileReadThread.cpp ./FileWriteThread.cpp ./LineReverseThread.cpp)
+target_compile_options( test PUBLIC -Wall -ggdb -O0 )
+target_link_libraries( test pthread )
