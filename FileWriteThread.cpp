@@ -2,7 +2,6 @@
 #include "FileWriteThread.hpp"
 
 #include <thread>
-
 #include <iostream>
 
 FileWriteThreadType::FileWriteThreadType(ofstream& out_fs) :
