@@ -10,13 +10,22 @@
 #include "FileWriteThread.hpp"
 #include "LineReverseThread.hpp"
 
+namespace FileLineReversal
+{
+  const int MIN_REV_THREADS = 1;
+  const int MAX_REV_THREADS = 10;
+};
+
 using namespace std;
+using namespace FileLineReversal;
 
 int main(int argc, char* argv[])
 {
-  if (argc != 3)
+  if ((argc < 3) || (argc > 4))
   {
-    cout << "Usage: revlines <input text file> <output text file>\n";
+    cout << "Usage: "
+         << argv[0]
+         << " <input text file> <output text file> <optional-num-rev-threads>\n";
     return -1;
   }
 
@@ -27,6 +36,22 @@ int main(int argc, char* argv[])
   {
     cout << "Input and output file names should differ." << in_file_name << "\n";
     return -1;
+  }
+
+  int num_rev_threads = 1;
+  if (argc == 4)
+  {
+    num_rev_threads = stoi(argv[3]);
+    if ((num_rev_threads < MIN_REV_THREADS) ||
+        (num_rev_threads > MAX_REV_THREADS))
+    {
+      cout << "Unsupported number of reversal threads "
+           << num_rev_threads
+           << " MIN:" << MIN_REV_THREADS
+           << " MAX:" << MAX_REV_THREADS
+           << "\n";
+      return -1;
+    }
   }
 
   ifstream in_fs(in_file_name, in_fs.in);
@@ -43,16 +68,21 @@ int main(int argc, char* argv[])
     return -1;
   }
 
+
   const clock_t c_start = clock();
 
   FileWriteThreadType fileWriteObj(out_fs);
   FileReadThreadType fileReadObj(in_fs);
-  vector<LineReverseThreadType> lineReverseObjs(2, LineReverseThreadType(fileReadObj, fileWriteObj));
-  vector<thread>  lineReverseThreads(lineReverseObjs.size());
+
+  // creating two threads for line reversal. don't expect
+  // needing more as these threads are fairly efficient
+  // and should be faster than the file read thread
+  vector<LineReverseThreadType> lineReverseObjs(num_rev_threads, LineReverseThreadType(fileReadObj, fileWriteObj));
+  vector<thread> lineReverseThreads(num_rev_threads);
 
   // start the line reverse threads first, so file read
   // thread doesn't get to fill up the read fifo queue
-  for (size_t i=0; i<lineReverseObjs.size(); i++)
+  for (auto i=0; i<num_rev_threads; i++)
   {
     lineReverseThreads[i] =
       std::thread(&LineReverseThreadType::ThreadMain, &lineReverseObjs[i]);
