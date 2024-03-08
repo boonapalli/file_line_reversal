@@ -34,7 +34,7 @@ void BasicThread::Start()
 {
   if (threadStarted)
   {
-    throw(Exception("Thread already started"));
+    throw(std::runtime_error("Thread already started"));
   }
 
   threadStarted = true;
@@ -45,7 +45,7 @@ void BasicThread::Join()
 {
   if (!threadStarted)
   {
-    throw(Exception("Join without thread started"));
+    throw(std::runtime_error("Join without thread started"));
   }
 
   thisThread.join();
