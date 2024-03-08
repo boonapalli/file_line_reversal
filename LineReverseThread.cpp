@@ -5,7 +5,7 @@
 #include <thread>
 
 LineReverseThreadType::LineReverseThreadType(FileReadThreadType& read_thread,
-                                             FileWriteThreadType& write_thread) :
+                                             FileWriteThreadType& write_thread) : BasicThread(),
   fileReadObj(read_thread),
   fileWriteObj(write_thread)
 {

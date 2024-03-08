@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <array>
 #include <string>
 #include <fstream>
 #include <queue>
@@ -21,11 +22,11 @@ using namespace FileLineReversal;
 
 int main(int argc, char* argv[])
 {
-  if ((argc < 3) || (argc > 4))
+  if ((argc < 3) || (argc > 3))
   {
     cout << "Usage: "
          << argv[0]
-         << " <input text file> <output text file> <optional-num-rev-threads>\n";
+         << " <input text file> <output text file>\n";
     return -1;
   }
 
@@ -36,22 +37,6 @@ int main(int argc, char* argv[])
   {
     cout << "Input and output file names should differ." << in_file_name << "\n";
     return -1;
-  }
-
-  int num_rev_threads = 1;
-  if (argc == 4)
-  {
-    num_rev_threads = stoi(argv[3]);
-    if ((num_rev_threads < MIN_REV_THREADS) ||
-        (num_rev_threads > MAX_REV_THREADS))
-    {
-      cout << "Unsupported number of reversal threads "
-           << num_rev_threads
-           << " MIN:" << MIN_REV_THREADS
-           << " MAX:" << MAX_REV_THREADS
-           << "\n";
-      return -1;
-    }
   }
 
   ifstream in_fs(in_file_name, in_fs.in);
@@ -71,49 +56,38 @@ int main(int argc, char* argv[])
 
   const clock_t c_start = clock();
 
-  FileWriteThreadType fileWriteObj(out_fs);
-  FileReadThreadType fileReadObj(in_fs);
+  FileWriteThreadType fileWriteThread(out_fs);
+  FileReadThreadType fileReadThread(in_fs);
+  LineReverseThreadType lineReverseThread(fileReadThread, fileWriteThread);
 
-  // creating two threads for line reversal. don't expect
-  // needing more as these threads are fairly efficient
-  // and should be faster than the file read thread
-  vector<LineReverseThreadType> lineReverseObjs(num_rev_threads, LineReverseThreadType(fileReadObj, fileWriteObj));
-  vector<thread> lineReverseThreads(num_rev_threads);
-
-  // start the line reverse threads first, so file read
+  // start the line reverse thread first, so file read
   // thread doesn't get to fill up the read fifo queue
-  for (auto i=0; i<num_rev_threads; i++)
-  {
-    lineReverseThreads[i] =
-      std::thread(&LineReverseThreadType::ThreadMain, &lineReverseObjs[i]);
-  }
+  lineReverseThread.Start();
 
   // start the file write thread next, so line reverse
   // threads don't fill up the write fifo queue
-  std::thread fileWriteThread(&FileWriteThreadType::ThreadMain, &fileWriteObj);
+  fileWriteThread.Start();
 
-  std::thread fileReadThread(&FileReadThreadType::ThreadMain, &fileReadObj);
+  // finaly start the file read thread
+  fileReadThread.Start();
 
   // wait for the file read to be complete
-  while (!fileReadObj.JobComplete())
+  while (!fileReadThread.JobComplete())
   {
     std::this_thread::yield();
   }
 
   // tell the file write thread to wrap up
-  fileWriteObj.SetJobWrapUp();
+  fileWriteThread.SetJobWrapUp();
 
   // wait for file read thread to be done
-  fileReadThread.join();
+  fileReadThread.Join();
 
   // wait for file write thread to be done
-  fileWriteThread.join();
+  fileWriteThread.Join();
 
-  // wait for line reverse threads to join
-  for (size_t i=0; i<lineReverseObjs.size(); i++)
-  {
-    lineReverseThreads[i].join();
-  }
+  // wait for line reverse thread to join
+  lineReverseThread.Join();
 
   const clock_t c_end = clock();
 

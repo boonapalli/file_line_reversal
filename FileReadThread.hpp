@@ -1,7 +1,8 @@
 #ifndef FILE_READ_THREAD_HPP
 #define FILE_READ_THREAD_HPP
 
-#include <thread>
+#include "BasicThread.hpp"
+
 #include <fstream>
 #include <mutex>
 #include <queue>
@@ -10,15 +11,17 @@
 
 using namespace std;
 
-class FileReadThreadType
+class FileReadThreadType : public BasicThread
 {
 public:
   FileReadThreadType(ifstream& in_fs);
-  void ThreadMain();
 
 public:
   bool GetNextLine(string& next_line);
   bool JobComplete();
+
+private:
+  void ThreadMain();
 
 private:
   ifstream& inFS;

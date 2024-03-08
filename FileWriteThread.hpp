@@ -1,6 +1,8 @@
 #ifndef FILE_WRITE_THREAD_HPP
 #define FILE_WRITE_THREAD_HPP
 
+#include "BasicThread.hpp"
+
 #include <fstream>
 #include <mutex>
 #include <queue>
@@ -9,15 +11,17 @@
 
 using namespace std;
 
-class FileWriteThreadType
+class FileWriteThreadType : public BasicThread
 {
 public:
   FileWriteThreadType(ofstream& out_fs);
-  void ThreadMain();
 
 public:
   void PushLine(string& next_line);
   void SetJobWrapUp();
+
+private:
+  void ThreadMain();
 
 private:
   ofstream& outFS;

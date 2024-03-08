@@ -3,15 +3,16 @@
 
 #include "FileReadThread.hpp"
 #include "FileWriteThread.hpp"
+#include "BasicThread.hpp"
 
-class LineReverseThreadType
+class LineReverseThreadType : public BasicThread
 {
 public:
   LineReverseThreadType(FileReadThreadType& read_thread,
     FileWriteThreadType& write_thread);
-  void ThreadMain();
 
 private:
+  void ThreadMain();
   static void ReverseString(string& str);
 
 private:
