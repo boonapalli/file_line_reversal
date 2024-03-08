@@ -18,8 +18,8 @@ BasicThread::BasicThread(const BasicThread& other) :
 BasicThread::BasicThread(BasicThread&& other) :
   threadStarted(other.threadStarted)
 {
-  std::cout << "BasicThread move constructor called\n";
   thisThread = std::move(other.thisThread);
+  other.threadStarted = false;
 }
 
 BasicThread::~BasicThread()
