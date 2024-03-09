@@ -28,7 +28,6 @@ private:
   atomic_bool fileReadComplete;
   queue<string> fifoQueue;
   mutex fifoQueueMutex;
-  static const size_t SlowdownQueueSize;
 };
 
 #endif // FILE_READ_THREAD_HPP

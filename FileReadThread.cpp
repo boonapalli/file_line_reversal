@@ -4,8 +4,6 @@
 #include <iostream>
 #include <chrono>
 
-const size_t FileReadThreadType::SlowdownQueueSize = 1000;
-
 FileReadThreadType::FileReadThreadType(ifstream& in_fs) :
   inFS(in_fs),
   fileReadComplete(false)
@@ -15,24 +13,11 @@ FileReadThreadType::FileReadThreadType(ifstream& in_fs) :
 void FileReadThreadType::ThreadMain()
 {
   string read_line;
-  size_t queue_size;
 
   while (getline(inFS, read_line))
   {
-    {
-      std::lock_guard<mutex> lock(fifoQueueMutex);
-      queue_size = fifoQueue.size();
-    }
-
-    if (queue_size > SlowdownQueueSize)
-    {
-      std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-    }
-
-    {
-      std::lock_guard<mutex> lock(fifoQueueMutex);
-      fifoQueue.push(read_line);
-    }
+    std::lock_guard<mutex> lock(fifoQueueMutex);
+    fifoQueue.push(read_line);
   }
 
   fileReadComplete = true;
