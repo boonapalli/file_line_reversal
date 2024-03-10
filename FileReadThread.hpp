@@ -21,7 +21,7 @@ public:
   bool JobComplete();
 
 private:
-  void ThreadMain();
+  void ThreadMain(std::stop_token);
 
 private:
   ifstream& inFS;

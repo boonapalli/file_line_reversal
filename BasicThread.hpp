@@ -12,14 +12,15 @@ public:
   virtual ~BasicThread();
 
   void Start();
+  void RequestStop();
   void Join();
 
 private:
-  virtual void ThreadMain() = 0;
+  virtual void ThreadMain(std::stop_token) = 0;
 
 private:
   bool threadStarted;
-  std::thread thisThread;
+  std::jthread thisThread;
 };
 
 #endif // BASIC_THREAD_HPP

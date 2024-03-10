@@ -37,7 +37,17 @@ void BasicThread::Start()
   }
 
   threadStarted = true;
-  thisThread = std::thread(&BasicThread::ThreadMain, this);
+  thisThread = std::jthread(&BasicThread::ThreadMain, this);
+}
+
+void BasicThread::RequestStop()
+{
+  if (!threadStarted)
+  {
+    throw(std::runtime_error("Requesting stop on a thread that's not started."));
+  }
+
+  thisThread.request_stop();
 }
 
 void BasicThread::Join()

@@ -5,12 +5,11 @@
 #include <iostream>
 
 FileWriteThreadType::FileWriteThreadType(ofstream& out_fs) :
-  outFS(out_fs),
-  jobWrapUp(false)
+  outFS(out_fs)
 {
 }
 
-void FileWriteThreadType::ThreadMain()
+void FileWriteThreadType::ThreadMain(std::stop_token stop_token)
 {
   string next_line;
   bool line_read;
@@ -35,7 +34,7 @@ void FileWriteThreadType::ThreadMain()
     }
     else
     {
-      if (jobWrapUp)
+      if (stop_token.stop_requested())
       {
         std::lock_guard<mutex> lock(fifoQueueMutex);
         if (fifoQueue.empty())
@@ -43,8 +42,10 @@ void FileWriteThreadType::ThreadMain()
           break;
         }
       }
-
-      std::this_thread::yield();
+      else
+      {
+        std::this_thread::yield();
+      }
     }
   }
 }
@@ -55,7 +56,3 @@ void FileWriteThreadType::PushLine(string& next_line)
   fifoQueue.push(next_line);
 }
 
-void FileWriteThreadType::SetJobWrapUp()
-{
-  jobWrapUp = true;
-}

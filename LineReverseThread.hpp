@@ -12,7 +12,7 @@ public:
     FileWriteThreadType& write_thread);
 
 private:
-  void ThreadMain();
+  void ThreadMain(std::stop_token);
   static void ReverseString(string& str);
 
 private:

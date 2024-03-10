@@ -77,11 +77,11 @@ int main(int argc, char* argv[])
     std::this_thread::yield();
   }
 
-  // tell the file write thread to wrap up
-  fileWriteThread.SetJobWrapUp();
-
   // wait for file read thread to be done
   fileReadThread.Join();
+
+  // tell the file write thread to wrap up
+  fileWriteThread.RequestStop();
 
   // wait for file write thread to be done
   fileWriteThread.Join();

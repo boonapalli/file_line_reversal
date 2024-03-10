@@ -10,11 +10,11 @@ FileReadThreadType::FileReadThreadType(ifstream& in_fs) :
 {
 }
 
-void FileReadThreadType::ThreadMain()
+void FileReadThreadType::ThreadMain(std::stop_token stop_token)
 {
   string read_line;
 
-  while (getline(inFS, read_line))
+  while (!stop_token.stop_requested() and getline(inFS, read_line))
   {
     std::lock_guard<mutex> lock(fifoQueueMutex);
     fifoQueue.push(read_line);

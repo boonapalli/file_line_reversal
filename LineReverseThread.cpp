@@ -20,9 +20,9 @@ void LineReverseThreadType::ReverseString(string& str)
   }
 }
 
-void LineReverseThreadType::ThreadMain()
+void LineReverseThreadType::ThreadMain(std::stop_token stop_token)
 {
-  while (!fileReadObj.JobComplete())
+  while (!stop_token.stop_requested() && !fileReadObj.JobComplete())
   {
     string next_line;
     if (fileReadObj.GetNextLine(next_line))

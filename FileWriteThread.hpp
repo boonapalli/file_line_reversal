@@ -18,14 +18,12 @@ public:
 
 public:
   void PushLine(string& next_line);
-  void SetJobWrapUp();
 
 private:
-  void ThreadMain();
+  void ThreadMain(std::stop_token);
 
 private:
   ofstream& outFS;
-  atomic_bool jobWrapUp;
   queue<string> fifoQueue;
   mutex fifoQueueMutex;
 };
