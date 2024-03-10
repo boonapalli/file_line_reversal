@@ -2,7 +2,6 @@
 #include "BasicThread.hpp"
 
 #include <iostream>
-#include <thread>
 
 BasicThread::BasicThread() :
   threadStarted(false)

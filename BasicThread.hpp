@@ -2,7 +2,6 @@
 #define BASIC_THREAD_HPP
 
 #include <thread>
-#include <exception>
 
 class BasicThread
 {
