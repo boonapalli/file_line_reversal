@@ -19,7 +19,6 @@ private:
   virtual void ThreadMain(std::stop_token) = 0;
 
 private:
-  bool threadStarted;
   std::jthread thisThread;
 };
 
